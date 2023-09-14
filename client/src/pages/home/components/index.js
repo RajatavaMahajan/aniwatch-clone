@@ -1,0 +1,6 @@
+export {default as SearchBar} from './SearchBar'
+export {default as TopAnime} from './TopAnime'
+export {default as PostCard} from './PostCard'
+export {default as ShareBox} from './ShareBox'
+export {default as SocialMediaIcon} from './SocialMediaIcon'
+export {default as CopyRight} from './CopyRight'
