@@ -1,57 +1,24 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useContext } from "react";
 const WatchAnimeContext = createContext();
 
 export const WatchAnimeContextProvider = ({ children }) => {
-  const [animeDetails, setAnimeDetails] = useState(null);
   const [animeId, setAnimeId] = useState(null);
   const [currentEpisodeNo, setCurrentEpisodeNo] = useState(1);
-  const [epUrl, setEpUrl] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-    if (animeId) {
-      const updateAnimeDetails = async (animeId) => {
-        const anime = await fetch(
-          `https://webdis-zoq8.onrender.com/anime-details/${animeId}`,
-          { signal }
-        )
-          .then((res) => res.json())
-          .then((data) => data);
-        setAnimeDetails(anime);
-        setIsLoading(false);
-      };
-      updateAnimeDetails(animeId);
-    }
-    return () => {
-      controller.abort();
-    };
-  }, [animeId]);
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-    if (animeDetails) {
-      const getEpisodeUrl = async () => {
-        setEpUrl(null);
-        console.log(currentEpisodeNo);
-        const currentEpisodeId = animeDetails.episodesList.find(
-          (ep) => ep.episodeNum == currentEpisodeNo
-        ).episodeId;
-        const episodeUrl = await fetch(
-          `https://webdis-zoq8.onrender.com/vidcdn/watch/${currentEpisodeId}`,
-          { signal }
-        )
-          .then((res) => res.json())
-          .then((data) => data.sources[0].file);
-        console.log(episodeUrl);
-        setEpUrl(episodeUrl);
-      };
-      getEpisodeUrl();
-    }
-    return () => {
-      controller.abort();
-    };
-  }, [currentEpisodeNo, animeDetails]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Static anime details
+  const animeDetails = {
+    animeTitle: "Attack on Titan",
+    animeImg: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=400",
+    totalEpisodes: 24,
+    episodesList: Array.from({ length: 24 }, (_, i) => ({
+      episodeId: `episode-${i + 1}`,
+      episodeNum: i + 1
+    }))
+  };
+
+  // Static video URL (sample video)
+  const epUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
   return (
     <WatchAnimeContext.Provider

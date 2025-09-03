@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
-import Hls from "hls.js";
 import { useWatchAnimeStateContext } from "../context";
 import { loading } from "../assets/index";
+
 const VideoStream = () => {
   const { epUrl } = useWatchAnimeStateContext();
   const videoRef = useRef(null);
@@ -12,54 +12,24 @@ const VideoStream = () => {
 
   useEffect(() => {
     if (epUrl) {
-      console.log("url is ", epUrl);
       const video = videoRef.current;
       if (!video) return;
 
-      let hls = null;
-      function updateQuality(newQuality) {
-        if (!hls) return;
-        if (newQuality === 0) {
-          hls.currentLevel = -1;
-        } else {
-          hls.levels.forEach((level, levelIndex) => {
-            if (level.height == newQuality) {
-              hls.currentLevel = levelIndex;
-            }
-          });
-        }
-      }
       const defaultOptions = {
-        // ... other options ...
-        quality: {
-          default: "Auto",
-          options: [], // Will be populated dynamically
-          forced: true,
-          onChange: updateQuality,
-        },
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+        settings: ['quality', 'speed'],
       };
 
-      if (Hls.isSupported()) {
-        hls = new Hls();
-        hls.loadSource(epUrl);
-
-        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-          const availableQualities = hls.levels.map((l) => l.height);
-          availableQualities.unshift(0);
-          defaultOptions.quality.options = availableQualities;
-          playerRef.current = new Plyr(video, defaultOptions);
-
-          setIsVideoLoading(false); // Mark video as loaded
-        });
-
-        hls.attachMedia(video);
-      } else {
-        video.src = epUrl;
-      }
+      video.src = epUrl;
+      playerRef.current = new Plyr(video, defaultOptions);
+      
+      video.addEventListener('loadeddata', () => {
+        setIsVideoLoading(false);
+      });
 
       return () => {
-        if (hls) {
-          hls.destroy();
+        if (playerRef.current) {
+          playerRef.current.destroy();
         }
         setIsVideoLoading(true);
       };
@@ -78,8 +48,8 @@ const VideoStream = () => {
             height: "100%",
           }}
           crossOrigin="true"
+          controls
         >
-          <source src={epUrl} type="application/x-mpegURL" color="green" />
           Your browser does not support the video tag.
         </video>
         {isVideoLoading && (

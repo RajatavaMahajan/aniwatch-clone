@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 const TopAnime = () => {
-  const [topAnime, setTopAnime] = useState([]);
-  useEffect(() => {
-    fetch("https://webdis-zoq8.onrender.com/top-airing")
-      .then((response) => response.json())
-      .then((animelist) => {
-        console.log(animelist);
-        setTopAnime(animelist);
-      });
-  }, []);
+  const topAnime = [
+    { animeId: "1", animeTitle: "Attack on Titan" },
+    { animeId: "2", animeTitle: "Demon Slayer" },
+    { animeId: "3", animeTitle: "One Piece" },
+    { animeId: "4", animeTitle: "Naruto" },
+    { animeId: "5", animeTitle: "Dragon Ball Z" },
+    { animeId: "6", animeTitle: "My Hero Academia" }
+  ];
+
   return (
     <div className=" text-[14px]">
       <span className=" font-bold">Top Anime : </span>
